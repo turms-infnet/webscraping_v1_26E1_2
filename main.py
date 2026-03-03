@@ -1,9 +1,10 @@
 import logging
 import os
+import argparse
 
 from extracao import extrair_conteudo_html
-from carga import salvar_csv, ler_csv
-from transformacao import limpar_preco, transformar_html_em_objeto
+from carga import salvar_csv
+from transformacao import transformar_html_em_objeto
 
 logging.basicConfig(
     filename="server.log",
@@ -12,11 +13,34 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s no arquivo %(filename)s e função %(funcName)s na linha %(lineno)d: %(message)s",
 )
 
-URL: str = "http://books.toscrape.com/"
-FILE_NAME: str = "output.csv"
+URL: str = ""
+FILE_NAME: str = ""
 FOLDER_NAME = os.path.dirname(os.path.abspath(__file__))
 
+
 def main():
+    logging.info("Capturando argumentos")
+    parser = argparse.ArgumentParser(description="Web Scraping de livros")
+
+    parser.add_argument(
+        "--url",
+        type=str,
+        required=True,
+        default="http://books.toscrape.com/",
+        help="URL do site a ser raspado",
+    )
+    parser.add_argument(
+        "--file",
+        type=str,
+        required=True,
+        default="output.csv",
+        help="Nome do arquivo CSV de saída",
+    )
+
+    args = parser.parse_args()
+    URL = args.url
+    FILE_NAME = args.file
+
     logging.info("Iniciando execução do webscrapping")
     livros_totais = []
 
@@ -38,6 +62,7 @@ def main():
 
     if len(livros_totais) > 0:
         salvar_csv(livros_totais, FOLDER_NAME, FILE_NAME, logging)
+
 
 if __name__ == "__main__":
     main()

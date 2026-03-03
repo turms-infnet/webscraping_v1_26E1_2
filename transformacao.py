@@ -45,12 +45,12 @@ def transformar_html_em_objeto(
         image = ""
         quantity_available = 0
 
-        try:
-            description, image, quantity_available = getBookInfos(url, path, logging)
-        except Exception as e:
-            logging.error(
-                f"Um error ocorreu ao tentar pegar as informações do livro {str(e)}"
-            )
+        # try:
+        #     description, image, quantity_available = getBookInfos(url, path, logging)
+        # except Exception as e:
+        #     logging.error(
+        #         f"Um error ocorreu ao tentar pegar as informações do livro {str(e)}"
+        #     )
 
         price = artigo.find("p", class_="price_color").text
         rating = getRating(artigo)
