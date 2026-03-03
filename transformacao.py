@@ -10,6 +10,15 @@ def limpar_preco(texto_preco: str) -> float:
     """
     Retorna o preço sem os caractéres monetários, no formato ponto flutuante.
     """
+    preco_limpo = re.sub(r"[^0-9.,]", "", texto_preco)
+    preco_limpo = preco_limpo.replace(",", ".")
+    try:
+        return float(preco_limpo)
+    except ValueError:
+        logging.error(f"Erro ao converter o preço: {texto_preco}")
+        return 0.0
+    except Exception as e:
+        logging.error(f"Um erro inesperado ocorreu ao limpar o preço: {str(e)}")
     return 0.0
 
 
@@ -21,7 +30,9 @@ def transformar_html_em_objeto(
     Retorna essa list para quem o aciona, seguindo o padrão do livro.
     """
 
+    logging.info("Iniciando transformação do HTML em objeto")
     soup = BeautifulSoup(html, "html.parser")
+    next_btn = soup.find("li", class_="next")
     artigos = soup.find_all("article", class_="product_pod")
 
     livros = []
@@ -34,12 +45,12 @@ def transformar_html_em_objeto(
         image = ""
         quantity_available = 0
 
-        # try:
-        #     description, image, quantity_available = getBookInfos(url, path, logging)
-        # except Exception as e:
-        #     logging.error(
-        #         f"Um error ocorreu ao tentar pegar as informações do livro {str(e)}"
-        #     )
+        try:
+            description, image, quantity_available = getBookInfos(url, path, logging)
+        except Exception as e:
+            logging.error(
+                f"Um error ocorreu ao tentar pegar as informações do livro {str(e)}"
+            )
 
         price = artigo.find("p", class_="price_color").text
         rating = getRating(artigo)
@@ -57,11 +68,12 @@ def transformar_html_em_objeto(
             }
         )
 
-    return livros
+    logging.info("Concluindo transformação do HTML em objeto")
+    return livros, next_btn
 
 
 def getBookInfos(url: str, path: str, logging: logging) -> Any:
-    html_item: str = extrair_conteudo_html(f"{url}{path}", logging)
+    html_item: str = extrair_conteudo_html(f"{url}catalogue/{path}", logging)
     soup = BeautifulSoup(html_item, "html.parser")
     item = soup.find("article", class_="product_page")
 

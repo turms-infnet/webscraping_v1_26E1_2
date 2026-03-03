@@ -20,16 +20,24 @@ def main():
     logging.info("Iniciando execução do webscrapping")
     livros_totais = []
 
-    html = extrair_conteudo_html(URL, logging)
-    if html:
-        livros = transformar_html_em_objeto(html, URL, logging)
-        livros_totais.extend(livros)
+    url_pagina = f"{URL}catalogue/page-1.html"
 
-    if len(livros_totais) > 0:
-        salvar_csv(livros, FOLDER_NAME, FILE_NAME, logging)
+    while True:
+        logging.info(f"Extraindo conteúdo HTML da página: {url_pagina}")
+        html = extrair_conteudo_html(url_pagina, logging)
+        if html:
+            livros, next_btn = transformar_html_em_objeto(html, URL, logging)
+            livros_totais.extend(livros)
+
+        if next_btn:
+            url_pagina = f"{URL}catalogue/{next_btn.find('a')['href']}"
+        else:
+            break
 
     logging.info("Finalizando execução do webscrapping")
 
+    if len(livros_totais) > 0:
+        salvar_csv(livros_totais, FOLDER_NAME, FILE_NAME, logging)
 
 if __name__ == "__main__":
     main()
