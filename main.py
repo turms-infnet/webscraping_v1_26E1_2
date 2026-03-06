@@ -38,14 +38,14 @@ def main():
     parser.add_argument(
         "--url",
         type=str,
-        required=True,
+        required=False,
         default="http://books.toscrape.com/",
         help="URL do site a ser raspado",
     )
     parser.add_argument(
         "--file",
         type=str,
-        required=True,
+        required=False,
         default="output.csv",
         help="Nome do arquivo CSV de saída",
     )
